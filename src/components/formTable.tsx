@@ -47,8 +47,6 @@ export const FormTable = () => {
     void fetchData();
   }, []);
   const handleClick = () => {
-    console.log(beginDate);
-    console.log(endDate);
     if (beginDate && endDate) {
       void transferenciaAPI
         .fetchTransactionsBetweenDate(
@@ -58,6 +56,11 @@ export const FormTable = () => {
         .then((data) => {
           setTransferencias(data);
         });
+    }
+    else if(operatorName){
+      void transferenciaAPI.fetchTransactionsByNomeOperador(operatorName).then((data) => {
+        setTransferencias(data);
+      });
     }
   };
 
@@ -119,7 +122,7 @@ export const FormTable = () => {
                       <TableCell>{transferencia.valor}</TableCell>
                       <TableCell>{transferencia.tipo}</TableCell>
                       <TableCell>
-                        {transferencia.conta.nomeResponsavel}
+                        {transferencia.nomeOperadorTransacao}
                       </TableCell>
                     </TableRow>
                   ))}

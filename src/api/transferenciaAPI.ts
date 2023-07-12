@@ -23,5 +23,19 @@ export const transferenciaAPI = {
         console.log('Error:', error);
         throw error;
       });
+  },
+  fetchTransactionsByNomeOperador: async(nome : string) =>{
+   
+    
+    return axios.get(`http://localhost:8080/api/transferencias/listar/search/?nome=${nome}`)
+    .then(response => {
+      const transferencias = response.data as Transferencia[];
+      console.log(transferencias);
+      return transferencias;
+    })
+    .catch(error => {
+      console.log('Error:', error);
+      throw error;
+    })
   }
 }
