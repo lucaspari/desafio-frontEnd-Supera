@@ -110,10 +110,7 @@ export const FormTable = () => {
           <ExtendTable>
             <MoneyInfo>
               <Typography fontSize={20} m={1}>
-                Saldo Total R$ 50,00
-              </Typography>
-              <Typography fontSize={20} m={1}>
-                Saldo no período: R$ 50,00
+                Valor Total: {transferencias.length > 0 ? transferencias.map((item) => item.valor).reduce((a : number,b : number) => a + b).toFixed(2) : 0}
               </Typography>
             </MoneyInfo>
             <TableContainer>
