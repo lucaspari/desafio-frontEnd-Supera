@@ -11,12 +11,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import Transferencia from "../types/transferencia";
+import { helpers } from "../helpers/helpers";
+import { transferenciaAPI } from "../api/transferenciaAPI";
 export const FormTable = () => {
   const [beginDate, setBeginDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [operatorName, setOperatorName] = useState<string>("");
+  const [transferencias, setTransferencias] = useState<Transferencia[]>([]);
   const handleBeginDateChange = (date: Date | null) => {
     setBeginDate(date);
   };
@@ -24,10 +28,37 @@ export const FormTable = () => {
   const handleEndDateChange = (date: Date | null) => {
     setEndDate(date);
   };
+
   const handleOperatorNameChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setOperatorName(event.target.value);
+  };
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await transferenciaAPI.fetchTransactions();
+        setTransferencias(data);
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+
+    void fetchData();
+  }, []);
+  const handleClick = () => {
+    console.log(beginDate);
+    console.log(endDate);
+    if (beginDate && endDate) {
+      void transferenciaAPI
+        .fetchTransactionsBetweenDate(
+          helpers.formatDateToString(beginDate),
+          helpers.formatDateToString(endDate)
+        )
+        .then((data) => {
+          setTransferencias(data);
+        });
+    }
   };
 
   return (
@@ -51,44 +82,53 @@ export const FormTable = () => {
           />
         </FlexContainer>
         <PesquisarButton>
-          <Button variant="outlined">Pesquisar</Button>
+          <Button onClick={handleClick} variant="outlined">
+            Pesquisar
+          </Button>
         </PesquisarButton>
       </form>
       <FlexContainer>
-      <Box width="100%">
-    <ExtendTable>
-    <MoneyInfo>
-    <Typography fontSize={20} m={1}>
-        Saldo Total R$ 50,00
-      </Typography>
-      <Typography fontSize={20} m={1}>
-        Saldo no período: R$ 50,00
-      </Typography>
-    </MoneyInfo>
-      <TableContainer >
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Dados</TableCell>
-              <TableCell>Valentia</TableCell>
-              <TableCell>Tipo</TableCell>
-              <TableCell>Nome operador transacionado</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>Data 1</TableCell>
-              <TableCell>Data 2</TableCell>
-              <TableCell>Data 3</TableCell>
-              <TableCell>Data 4</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </ExtendTable>
-    </Box>
+        <Box width="100%">
+          <ExtendTable>
+            <MoneyInfo>
+              <Typography fontSize={20} m={1}>
+                Saldo Total R$ 50,00
+              </Typography>
+              <Typography fontSize={20} m={1}>
+                Saldo no período: R$ 50,00
+              </Typography>
+            </MoneyInfo>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Dados</TableCell>
+                    <TableCell>Valentia</TableCell>
+                    <TableCell>Tipo</TableCell>
+                    <TableCell>Nome operador transacionado</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transferencias.map((transferencia) => (
+                    <TableRow key={transferencia.id}>
+                      <TableCell>
+                        {helpers.formatDateStringToString(
+                          transferencia.dataTransferencia
+                        )}
+                      </TableCell>
+                      <TableCell>{transferencia.valor}</TableCell>
+                      <TableCell>{transferencia.tipo}</TableCell>
+                      <TableCell>
+                        {transferencia.conta.nomeResponsavel}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </ExtendTable>
+        </Box>
       </FlexContainer>
-
     </>
   );
 };
@@ -104,11 +144,11 @@ const PesquisarButton = styled.div`
   justify-content: flex-end;
 `;
 const ExtendTable = styled.div`
-gap: 2em;
-border: 1px solid;
-`
+  gap: 2em;
+  border: 1px solid;
+`;
 const MoneyInfo = styled.div`
-display: flex;
-gap: 2em;
-border-bottom: 1px solid;
-`
+  display: flex;
+  gap: 2em;
+  border-bottom: 1px solid;
+`;
