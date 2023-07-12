@@ -47,7 +47,22 @@ export const FormTable = () => {
     void fetchData();
   }, []);
   const handleClick = () => {
-    if (beginDate && endDate) {
+    if(beginDate && endDate && operatorName){
+      void transferenciaAPI.fetchTransactionsByNomeAndDates(
+        operatorName,
+        helpers.formatDateToString(beginDate),
+        helpers.formatDateToString(endDate),
+
+      ).then((data) => {
+        setTransferencias(data);
+      });
+    }
+    else if (!beginDate && !endDate && !operatorName) {
+      void transferenciaAPI.fetchTransactions().then((data) => {
+        setTransferencias(data);
+      });
+    } 
+    else if (beginDate && endDate) {
       void transferenciaAPI
         .fetchTransactionsBetweenDate(
           helpers.formatDateToString(beginDate),

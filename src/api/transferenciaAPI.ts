@@ -30,6 +30,18 @@ export const transferenciaAPI = {
     return axios.get(`http://localhost:8080/api/transferencias/listar/search/?nome=${nome}`)
     .then(response => {
       const transferencias = response.data as Transferencia[];
+      return transferencias;
+    })
+    .catch(error => {
+      console.log('Error:', error);
+      throw error;
+    })
+  },
+  fetchTransactionsByNomeAndDates: async(nome : string,d1 : string,d2 : string) =>{
+   
+    return axios.get(`http://localhost:8080/api/transferencias/listar/search/?startDate=${d1}&endDate=${d2}&nome=${nome}`)
+    .then(response => {
+      const transferencias = response.data as Transferencia[];
       console.log(transferencias);
       return transferencias;
     })
